@@ -40,7 +40,7 @@ class TextDataset(Dataset):
         # Включаем разделение на обучающую и валидационную выборки в методе __init__
         self.train_texts, self.val_texts = self.split_train_val(texts, self.VAL_RATIO, self.TRAIN_VAL_RANDOM_SEED)
         self.texts = self.train_texts if train else self.val_texts
-        self.indices = [self.text2ids(text) for text in self.texts] # FIX: Поменял texts на text
+        self.indices = [self.text2ids(text) for text in self.texts]
         
         self.pad_id, self.unk_id, self.bos_id, self.eos_id = \
             self.sp_model.pad_id(), self.sp_model.unk_id(), \
@@ -88,13 +88,12 @@ class TextDataset(Dataset):
         :param item: text id
         :return: encoded text indices and its actual length (including BOS and EOS specials)
         """
-        indices = self.indices[item]  # Получаем индексы текста
+        indices = self.indices[item]
 
-        # Добавляем специальные токены и обрезаем до максимальной длины
         indices = [self.bos_id] + indices + [self.eos_id]
         indices = indices[:self.max_length]
 
         # Дополняем до максимальной длины
         padded_indices = indices + [self.pad_id] * (self.max_length - len(indices))
 
-        return torch.tensor(padded_indices), len(indices)  # Возвращаем тензор с заполненными индексами и их фактическую длину
+        return torch.tensor(padded_indices), len(indices)
